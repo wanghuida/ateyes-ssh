@@ -10,8 +10,18 @@
   	<description></description>
   	<servlet-class>ateyes.ssh.user.Login</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>Save</servlet-name>
+  	<display-name>Save</display-name>
+  	<description></description>
+  	<servlet-class>ateyes.ssh.user.Save</servlet-class>
+  </servlet>
   <servlet-mapping>
   	<servlet-name>Login</servlet-name>
   	<url-pattern>/login</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>Save</servlet-name>
+  	<url-pattern>/save</url-pattern>
   </servlet-mapping>
 </web-app>
