@@ -1,12 +1,24 @@
 package ateyes.ssh.user;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Cookie;
+
+import org.apache.log4j.Logger;
+
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.ResultSet;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+
 
 /**
  * Servlet implementation class Login
@@ -14,11 +26,13 @@ import javax.servlet.http.HttpServletResponse;
 public class Login extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
+    private Logger log;
     /**
      * Default constructor. 
      */
     public Login() {
-        // TODO Auto-generated constructor stub
+    	super();
+    	this.log = Logger.getLogger(Login.class);
     }
 
     /**
@@ -32,27 +46,48 @@ public class Login extends HttpServlet {
      * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // TODO Auto-generated method stub
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("utf-8");
+        //request.setCharacterEncoding("UTF-8");
+        //response.setCharacterEncoding("utf-8");
+    	String rdbPath = null;
+    	try {
+	    	URL rdb = this.getClass().getClassLoader().getResource("ssh.rdb");
+			rdbPath = rdb.toURI().getPath();
+            log.info(rdbPath);
+            
+            Class.forName("org.sqlite.JDBC");
+		} catch (URISyntaxException e) {
+			log.fatal(e.getMessage());
+		} catch (ClassNotFoundException e) {
+			log.fatal(e.getMessage());
+		}
+    	
         String username = request.getParameter("username");
         String passwd = request.getParameter("passwd");
-        response.setContentType("text/html;charset=utf-8");
-
-          PrintWriter out=response.getWriter();
-          out.println("<html>");
-          out.println("<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>");
-          out.println("<html xmlns='http://www.w3.org/1999/xhtml'>");
-          out.println("<HEAD><TITLE>用户信息</TITLE></HEAD>");
-          out.println("<h1>你的信息如下：</h1>");
-          out.println("<BODY>");
-          out.println("<br>用户："+request.getParameter("username")+"<br>");
-          out.println("<br>密码："+request.getParameter("password")+"<br>");  
-          out.println("</BODY>");
-          out.println("</html>");
-          
-          System.out.println(username);
-          System.out.println(passwd);
+        
+        try {
+			Connection conn = DriverManager.getConnection("jdbc:sqlite:" + rdbPath);
+			String sql = "select * from user where username = ? and passwd = ?;";
+			PreparedStatement stat = conn.prepareStatement(sql);
+			stat.setString(1, username);
+			stat.setString(2, passwd);
+			ResultSet result = stat.executeQuery();
+			if (result.next()) {
+				//todo: encryption
+				Cookie cookie = new Cookie("ateyesuid",result.getString("username"));
+				cookie.setMaxAge(86400 * 30);
+				response.addCookie(cookie);
+				response.sendRedirect("index.jsp");
+			} else {
+				request.setAttribute("error", "登陆失败，请输入正确的账号和密码");
+		        request.getRequestDispatcher("index.jsp").forward(request, response);
+			}
+			result.close();
+			stat.close();
+			conn.close();
+			return;
+		} catch (SQLException e) {
+			log.fatal(e.getMessage());
+		}
     }
 
 }

@@ -9,13 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URI;
 
 import org.apache.log4j.Logger;
 
@@ -50,7 +48,7 @@ public class Save extends HttpServlet {
         String rdbPath = null; 
         try {
             URL rdb = this.getClass().getClassLoader().getResource("ssh.rdb");
-            rdbPath = rdb.toURI().getRawPath();
+            rdbPath = rdb.toURI().getPath();
             log.info(rdbPath);
             
             Class.forName("org.sqlite.JDBC");
@@ -67,6 +65,7 @@ public class Save extends HttpServlet {
             response.sendRedirect("register.jsp");
             return;
         }
+        //todo: check user have existed
         try {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:" + rdbPath);            
             String sql = "insert into user (username,passwd) values (?,?);";
@@ -74,6 +73,7 @@ public class Save extends HttpServlet {
             stat.setString(1, username);
             stat.setString(2, passwd);
             stat.execute();
+            stat.close();
             conn.close();   
         } catch (SQLException e) {
             log.fatal(e.getMessage());

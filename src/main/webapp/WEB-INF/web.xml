@@ -16,6 +16,18 @@
   	<description></description>
   	<servlet-class>ateyes.ssh.user.Save</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>Success</servlet-name>
+  	<display-name>Success</display-name>
+  	<description></description>
+  	<servlet-class>ateyes.ssh.trade.Success</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>Purchased</servlet-name>
+  	<display-name>Purchased</display-name>
+  	<description></description>
+  	<servlet-class>ateyes.ssh.trade.Purchased</servlet-class>
+  </servlet>
   <servlet-mapping>
   	<servlet-name>Login</servlet-name>
   	<url-pattern>/login</url-pattern>
@@ -23,5 +35,13 @@
   <servlet-mapping>
   	<servlet-name>Save</servlet-name>
   	<url-pattern>/save</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>Success</servlet-name>
+  	<url-pattern>/success</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>Purchased</servlet-name>
+  	<url-pattern>/purchased</url-pattern>
   </servlet-mapping>
 </web-app>

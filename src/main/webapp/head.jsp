@@ -22,17 +22,35 @@
     <a class="brand" href="#">ateyes ssh</a>
     <div class="nav-collapse collapse">
       <ul class="nav">
-          <% Integer active = Integer.parseInt(request.getParameter("active")); %>
+        <% Integer active = Integer.parseInt(request.getParameter("active")); %>
         <li class="<% if (active == 1) out.print("active"); %>"><a href="/">首页</a></li>
         <li class="<% if (active == 2) out.print("active"); %>"><a href="#about">购买流程</a></li>
         <li class="<% if (active == 3) out.print("active"); %>"><a href="#contact">windows 教程</a></li>
         <li class="<% if (active == 3) out.print("active"); %>"><a href="#contact">mac 教程</a></li>
       </ul>
+      
+      <!-- todo: encryption verify -->
+      <% 
+        Cookie cookies[] = request.getCookies(); 
+        String ateyesuid = null;
+        for (int i=0; i < cookies.length; i++) {
+        	if (cookies[i].getName().equals("ateyesuid")) {
+        	    ateyesuid = cookies[i].getValue();	
+        	}
+        }
+        
+        if (ateyesuid == null) {
+      %>
       <form class="navbar-form pull-right" action="/login" method="post">
         <input class="span2" type="text" name="username" placeholder="用户名">
         <input class="span2" type="password" name="passwd" placeholder="密码">
-        <button type="submit" class="btn">登陆</button>
+        <button type="submit" class="btn">确定</button>
       </form>
+      <% } else { %>
+      <ul class="nav pull-right">
+		  <li><a href="#"><%= ateyesuid %></a></li>
+      </ul>
+      <% } %>
     </div><!--/.nav-collapse -->
   </div>  
   </div>
